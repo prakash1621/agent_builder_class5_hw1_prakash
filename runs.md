@@ -203,4 +203,35 @@ Starship has significantly higher thrust than Falcon Heavy. Falcon Heavy produce
 
 # Overall Learnings
 
- 
+ 1) 
+ One of the most interesting things I observed  tool descriptions affected tool selection.
+
+Initially, I created a `compare()` tool with a simple description explaining what the tool returned. The agent ignored the tool and performed comparisons directly in natural language. for example 
+
+@tool
+def compare(a: str, b: str, label: str) -> str:
+    """Compare two values and return a formatted comparison string."""
+    return f"{label}: a={a}, b={b}"
+
+ this tool is not triggered after running the agent
+
+After I changed the  to  “Use this tool whenever the user asks to compare two values,” the agent started calling the tool correctly. This helped me understand that tool descriptions are effectively prompts that guide agent behavior.
+like 
+def compare(a: str, b: str, label: str) -> str:
+    """Use this tool whenever the user asks to compare two values."""
+    return f"{label}: a={a}, b={b}"
+
+ this tool is   triggered after running the agent
+
+2) Next time I would like to  add better hallucination handling and retry logic when tools return unknown values  . I noticed that the agent sometimes continued reasoning even after receiving insufficient information from the tools.
+
+3) Pipeline vs Agent
+## Pipeline vs Agent
+
+The pipeline worked better for simple SQL questions because the steps were fixed and easy to follow. It was easier to debug  
+
+The agent worked much better when the question needed multiple tools or multiple data sources. For example, for the question “What is the thrust of the rocket we use for crewed missions?”, the agent first queried the launches database to find the rocket name and then used the JSON specs tool to get the thrust value.
+
+I also understood that agents need strong tool descriptions and a good system prompt to make correct tool-calling decisions. When I first added the `compare()` tool, the agent ignored it because the description only explained what the tool returns.
+
+After I changed the description to clearly say when the tool should be used, the agent started calling it correctly. This showed me that tool descriptions work almost like prompts and strongly affect agent behavior.
